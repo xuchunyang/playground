@@ -2,3 +2,13 @@
 
 * DONE Read & write file in C                                             :c:
 CLOSED: [2017-09-15 Fri 19:33]
+
+* DONE Get date in C                                                      :c:
+CLOSED: [2017-09-15 Fri 19:50]
+
+#+BEGIN_SRC sh
+date
+#+END_SRC
+
+#+RESULTS:
+: Fri Sep 15 19:37:35 CST 2017
