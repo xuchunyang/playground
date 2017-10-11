@@ -19,9 +19,12 @@ main ()
   fputs("Are you ready? [y/n] ", stdout);
   int ch = fgetc(stdin);
   ch == 'y' ? puts ("Yes") : puts ("No");
+  int ids[] = { 3, 42, 100 };
+  for (int i = 0; i < sizeof ids / sizeof ids[0]; i++)
+    printf ("ids[%d] = %d\n", i, ids[i]);
   return 0;
 }
 
 /* Local Variables: */
-/* compile-command: "cc hello-world.c && ./a.out" */
+/* compile-command: "cc hello-world.c && echo y | ./a.out" */
 /* End: */
