@@ -1,13 +1,15 @@
+CFLAGS = -std=c99 -Wall
+
 all: hello-world func
 
 # XXX: Split compiling and testing
 
 hello-world: hello-world.c
-	${CC} hello-world.c -o hello-world
+	$(CC) $(CFLAGS) hello-world.c -o hello-world
 	echo y | ./hello-world
 	rm hello-world
 
 func: func.c
-	${CC} func.c -o func
+	$(CC) $(CFLAGS) func.c -o func
 	./func
 	rm func
