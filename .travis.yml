@@ -1,0 +1,8 @@
+language: c
+
+compiler:
+  - clang
+  - gcc
+
+script:
+  - ${CC} hello-world.c -o hello-world && echo y | ./hello-world
