@@ -28,7 +28,7 @@ print_nums (int nums[], int length, char *sep)
 {
   for (int i = 0; i < length; i++) {
     printf("%d", nums[i]);
-    if (i != 4)
+    if (i != length - 1)
       printf ("%s ", sep);
     else
       fputs("\n", stdout);
@@ -45,9 +45,33 @@ sum_nums (int nums[], int length)
   return sum;
 }
 
-/* TODO: Reverse an array */
+int
+reverse_print (char *S)
+{
+  int len = length (S);
+  char *ptr = S + len - 1;
+  while (ptr >= S) putchar (*ptr--);
+  return 0;
+}
+
+int
+sort_print (int nums[], int size)
+{
+  for (int j = size - 1; j > 0; j--)
+    for (int i = 0; i < j; i++)
+      if (nums[i] > nums[i+1]) {
+        int tmp = nums[i];
+        nums[i] = nums[i+1];
+        nums[i+1] = tmp;
+      }
+  print_nums (nums, size, ",");
+  return 0;
+}
+
 /* TODO: Swap contents of two array */
 /* TODO: Build an number sequence */
+/* TODO: Build an random number sequence */
+/* TODO: Sort an array */
 
 int
 main ()
@@ -82,6 +106,17 @@ main ()
   {
     int nums[] = { 1, 2, 3, 4, 5 };
     assert (sum_nums (nums, 5) == 15);
+  }
+  {
+    char *S = "hello";
+    reverse_print (S);
+    puts ("");
+  }
+  {
+    int nums[] = { 4, 3, 2, 1 };
+    sort_print (nums, 4);
+    int nums2[] = {8, 1, 2, 4, 3, 7, 100, 0};
+    sort_print (nums2, 8);
   }
   return 0;
 }
