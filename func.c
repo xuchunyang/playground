@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>             /* random */
+#include <time.h>               /* time */
 
 int
 say_hi ()
@@ -78,9 +80,25 @@ nums_equal (int nums1[], int size1, int nums2[], int size2)
   return 0;
 }
 
-/* TODO: Swap contents of two array */
-/* TODO: Build an number sequence */
-/* TODO: Build an random number sequence */
+int
+num_seq (int nums[], int from, int to)
+{
+  for (int i = 0; i < to - from + 1; i++)
+    nums[i] = from + i;
+  return 0;
+}
+
+int
+random_nums (int nums[], int size)
+{
+  srandom (time (0));
+  for (int i = 0; i < size; i++)
+    {
+      /* XXX: Limit the range */
+      nums[i] = random ();
+    }
+  return 0;
+}
 
 int
 swap_ints (int *a, int *b)
@@ -163,6 +181,16 @@ main ()
     printf ("a = %d, b = %d\n", a, b);
     swap_ints (&a, &b);
     printf ("a = %d, b = %d\n", a, b);    
+  }
+  {
+    int nums[3];
+    num_seq (nums, 1, 3);
+    print_nums (nums, 3, ",");
+  }
+  {
+    int nums[3];
+    random_nums (nums, 3);
+    print_nums (nums, 3, ",");
   }
   return 0;
 }
