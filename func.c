@@ -81,7 +81,18 @@ nums_equal (int nums1[], int size1, int nums2[], int size2)
 /* TODO: Swap contents of two array */
 /* TODO: Build an number sequence */
 /* TODO: Build an random number sequence */
-/* TODO: Sort an array */
+
+int
+swap_nums (int nums1[], int nums2[], int size)
+{
+  for (int i = 0; i < size; i++)
+    {
+      int tmp = nums1[i];
+      nums1[i] = nums2[i];
+      nums2[i] = tmp;
+    }
+  return 0;
+}
 
 int
 main ()
@@ -134,6 +145,13 @@ main ()
     assert (nums_equal (nums1, 3, nums2, 3) == 0);
     nums1[0] = 100;
     assert (nums_equal (nums1, 3, nums2, 3) != 0);
+  }
+  {
+    int nums1[] = { 1, 2, 3 };
+    int nums2[] = { 3, 2, 1 };
+    swap_nums (nums1, nums2, 3);
+    print_nums (nums1, 3, ",");
+    print_nums (nums2, 3, ",");
   }
   return 0;
 }
