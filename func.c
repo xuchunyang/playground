@@ -83,14 +83,19 @@ nums_equal (int nums1[], int size1, int nums2[], int size2)
 /* TODO: Build an random number sequence */
 
 int
+swap_ints (int *a, int *b)
+{
+  int tmp = *a;
+  *a = *b;
+  *b = tmp;
+  return 0;
+}
+
+int
 swap_nums (int nums1[], int nums2[], int size)
 {
   for (int i = 0; i < size; i++)
-    {
-      int tmp = nums1[i];
-      nums1[i] = nums2[i];
-      nums2[i] = tmp;
-    }
+    swap_ints (&nums1[i], &nums2[i]);
   return 0;
 }
 
@@ -152,6 +157,12 @@ main ()
     swap_nums (nums1, nums2, 3);
     print_nums (nums1, 3, ",");
     print_nums (nums2, 3, ",");
+  }
+  {
+    int a = 1, b = 2;
+    printf ("a = %d, b = %d\n", a, b);
+    swap_ints (&a, &b);
+    printf ("a = %d, b = %d\n", a, b);    
   }
   return 0;
 }
