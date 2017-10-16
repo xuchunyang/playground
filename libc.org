@@ -110,3 +110,41 @@ main (int argc, char *argv[])
 | 5 |
 | 3 |
 | 5 |
+* Character Handling
+
+Classification of Characters:
+
+- lower/upper case
+- letter
+- digit
+- punctuation
+- whitespaces
+- blank
+- graph
+- print
+- cntrl
+- ascii
+
+#+BEGIN_SRC C :includes <ctype.h> <assert.h> :results silent
+assert (islower ('a'));
+assert (isupper ('A'));
+assert (isalpha ('a'));
+assert (isdigit ('3'));
+assert (isalnum ('a') && isalnum ('a'));
+assert (isxdigit ('0') && isxdigit ('a'));
+assert (ispunct (','));
+char whitespaces[] = { ' ', '\f', '\n', '\r', '\t', '\v', 0 };
+for (char *p = whitespaces; *p; p++)
+  assert (isspace (*p));
+assert (isblank (' ') && isblank ('\t'));
+assert (isgraph ('a') && ! isgraph (' '));
+assert (isprint ('a') && isprint (' '));
+assert (iscntrl ('\t'));
+#+END_SRC
+
+Case Conversion:
+
+#+BEGIN_SRC C :includes <ctype.h> <assert.h> :results silent
+assert (tolower ('A') == 'a');
+assert (toupper ('a') == 'A');
+#+END_SRC
