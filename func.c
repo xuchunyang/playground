@@ -212,6 +212,17 @@ main ()
     print_nums (ptr, size, ",");
     free (ptr);
   }
+  {
+    char *ptr;
+    int len = 10;
+    ptr = malloc (len + 1);
+    char *p = ptr;
+    for (int i = '0'; i <= '9'; i++)
+      *p++ = i;
+    p = 0;
+    puts (ptr);
+    free (ptr);
+  }
   return 0;
 }
 
