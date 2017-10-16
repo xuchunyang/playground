@@ -1,0 +1,46 @@
+* Error Reporting
+
+#+BEGIN_SRC C :includes <errno.h>
+printf ("The initial value of errno is %d", errno);
+#+END_SRC
+
+#+RESULTS:
+: The initial value of errno is 0
+
+#+BEGIN_SRC C :includes <errno.h> <string.h> :results output
+int errs[] = { EPERM, ENOENT, ESRCH, EINTR, EIO, ENXIO, E2BIG, ENOEXEC, EBADF, ENOMEM };
+int size = sizeof errs / sizeof (int);
+
+for (int i = 0; i < size; i++)
+  puts (strerror (errs[i]));
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+Operation not permitted
+No such file or directory
+No such process
+Interrupted system call
+Input/output error
+Device not configured
+Argument list too long
+Exec format error
+Bad file descriptor
+Cannot allocate memory
+#+END_EXAMPLE
+
+#+BEGIN_SRC C :includes <stdio.h> <errno.h> <string.h>
+char *filename = "nonexist.txt";
+FILE *file = fopen (filename, "r");
+if (file == NULL)
+  {
+    fprintf (stdout,      /* Should be stderr, but org-babel doesn't allow it */
+             "%s: Couldn't open file %s; %s\n",
+             "libc.org",
+             filename,
+             strerror (errno));
+  }
+#+END_SRC
+
+#+RESULTS:
+: libc.org: Couldn't open file nonexist.txt; No such file or directory
