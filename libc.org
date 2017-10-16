@@ -44,3 +44,69 @@ if (file == NULL)
 
 #+RESULTS:
 : libc.org: Couldn't open file nonexist.txt; No such file or directory
+* Memory
+
+#+BEGIN_SRC C :cmdline (number-to-string (1+ (random 10)))
+#include <stdlib.h>
+#include <assert.h>
+#include <time.h>
+
+int
+main (int argc, char *argv[])
+{
+  assert (argc > 1);
+  int size = atoi (argv[1]);
+  assert (size > 0);
+  int *ptr = malloc (size * sizeof (int));
+  if (NULL == ptr)
+    {
+      perror ("malloc");
+      exit (EXIT_FAILURE);
+    }
+  srandom (time (0));
+  for (int i = 0; i < size; i++)
+    ptr[i] = random () % 10;
+  for (int i = 0; i < size; i++)
+    printf ("%d\n", ptr[i]);
+  free (ptr);
+  return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+| 2 |
+| 1 |
+| 0 |
+| 2 |
+| 5 |
+| 4 |
+
+C99 variable-length arrays:
+
+#+BEGIN_SRC C :tangle foo.c :cmdline (number-to-string (1+ (random 10)))
+#include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
+
+int
+main (int argc, char *argv[])
+{
+  assert (argv[1] != NULL);
+  int size = atoi (argv[1]);
+  assert (size > 0);
+  int ary[size];
+  for (int i = 0; i < size; i++)
+    ary[i] = random () % 10;
+  for (int i = 0; i < size; i++)
+    printf ("%d\n", ary[i]);
+  return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+| 3 |
+| 6 |
+| 7 |
+| 5 |
+| 3 |
+| 5 |
