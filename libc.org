@@ -44,6 +44,7 @@ if (file == NULL)
 
 #+RESULTS:
 : libc.org: Couldn't open file nonexist.txt; No such file or directory
+
 * Memory
 
 #+BEGIN_SRC C :cmdline (number-to-string (1+ (random 10)))
@@ -110,6 +111,7 @@ main (int argc, char *argv[])
 | 5 |
 | 3 |
 | 5 |
+
 * Character Handling
 
 Classification of Characters:
