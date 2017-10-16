@@ -117,6 +117,18 @@ swap_nums (int nums1[], int nums2[], int size)
   return 0;
 }
 
+int *
+some_nums (int size)
+{
+  int *rtv = malloc (size * sizeof(int));
+  if (rtv == NULL)
+    {
+      perror ("malloc");
+      exit (EXIT_FAILURE);
+    }
+  return rtv;
+}
+
 int
 main ()
 {
@@ -191,6 +203,14 @@ main ()
     int nums[3];
     random_nums (nums, 3);
     print_nums (nums, 3, ",");
+  }
+  {
+    int size = 10;
+    int *ptr = some_nums (size);
+    for (int *p = ptr + 9, i = 10; p != ptr - 1; p--, i--)
+      *p = i;
+    print_nums (ptr, size, ",");
+    free (ptr);
   }
   return 0;
 }
