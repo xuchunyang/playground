@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <stdlib.h>             /* random */
 #include <time.h>               /* time */
+#include <stdarg.h>
 
 int
 say_hi ()
@@ -130,6 +131,20 @@ some_nums (int size)
 }
 
 int
+print_strings (const char *str, ...)
+{
+  va_list ap;
+
+  va_start (ap, str);
+
+  for (const char *s = str; s != NULL; s = va_arg (ap, const char *))
+    fputs (s, stdout);
+
+  va_end (ap);
+  return 0;
+}
+
+int
 main ()
 {
   {
@@ -222,6 +237,9 @@ main ()
     p = 0;
     puts (ptr);
     free (ptr);
+  }
+  {
+    print_strings ("Hello", ", ", "World", "!\n", NULL);
   }
   return 0;
 }
