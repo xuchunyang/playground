@@ -84,7 +84,7 @@ main (int argc, char *argv[])
 
 C99 variable-length arrays:
 
-#+BEGIN_SRC C :tangle foo.c :cmdline (number-to-string (1+ (random 10)))
+#+BEGIN_SRC C :cmdline (number-to-string (1+ (random 10)))
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -504,7 +504,7 @@ printf ("%d, %d", strcoll ("a", "b"), strcoll ("b", "a"));
 
 Sort an array of strings:
 
-#+BEGIN_SRC C :cmdline "d c b a" :tangle tmp.c
+#+BEGIN_SRC C :cmdline "d c b a"
 int
 compare_strings (const void *v1, const void *v2)
 {
