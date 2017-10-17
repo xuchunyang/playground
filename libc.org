@@ -153,7 +153,7 @@ assert (toupper ('a') == 'A');
 
 * String and Array Utilities
 :PROPERTIES:
-:header-args:C: :results output :includes <stdio.h> <string.h> <errno.h>
+:header-args:C: :results output :includes <stdio.h> <string.h> <errno.h> <stdlib.h>
 :END:
 
 ** C Strings
@@ -612,3 +612,73 @@ strchr v.s. strlen
 #+RESULTS:
 : hello!
 : hello!
+
+** Finding Tokens in a String
+:PROPERTIES:
+:header-args:C: :results output :includes <stdio.h> <string.h> <assert.h> <stdlib.h>
+:END:
+
+#+BEGIN_SRC C
+const char string[] = "words separated by spaces -- and, punctuation!";
+const char delimiters[] = " .,;:!-";
+char *token, *cp;
+
+cp = strdup (string);
+token = strtok (cp, delimiters); 
+if (token) puts (token);
+
+while (token = strtok (NULL, delimiters))
+  puts (token);
+#+END_SRC
+
+#+RESULTS:
+: words
+: separated
+: by
+: spaces
+: and
+: punctuation
+
+#+BEGIN_SRC C
+#include <libgen.h>
+
+int
+main (int argc, char *argv[])
+{
+  char *filename = argv[0];
+  puts (filename);
+  puts (basename (filename));
+  puts (dirname (filename));
+  return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+: /var/folders/7f/s191h4q97p90374yw15ssrs00000gn/T/babel-84l1SF/C-bin-8zhDjn
+: C-bin-8zhDjn
+: /var/folders/7f/s191h4q97p90374yw15ssrs00000gn/T/babel-84l1SF
+
+** Encode Binary Data
+
+#+BEGIN_SRC C
+for (long int i = 1; i < 10; i++)
+  printf ("%d = '%s'\n", i, l64a (i));
+#+END_SRC
+
+#+RESULTS:
+: 1 = '/'
+: 2 = '0'
+: 3 = '1'
+: 4 = '2'
+: 5 = '3'
+: 6 = '4'
+: 7 = '5'
+: 8 = '6'
+: 9 = '7'
+
+#+BEGIN_SRC C
+printf ("'%s' = %d", "/", a64l ("/"));
+#+END_SRC
+
+#+RESULTS:
+: '/' = 1
