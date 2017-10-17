@@ -487,3 +487,128 @@ printf ("%d", strncmp ("hello", "hello, world", strlen ("hello")));
 
 #+RESULTS:
 : 0
+
+** Collation Functions
+:PROPERTIES:
+:header-args:C: :results output :includes <stdio.h> <string.h> <assert.h> <stdlib.h>
+:END:
+
+~strcoll~ is similar to ~strcmp~ but uses the locale.
+
+#+BEGIN_SRC C
+printf ("%d, %d", strcoll ("a", "b"), strcoll ("b", "a"));
+#+END_SRC
+
+#+RESULTS:
+: -1, 1
+
+Sort an array of strings:
+
+#+BEGIN_SRC C :cmdline "d c b a" :tangle tmp.c
+int
+compare_strings (const void *v1, const void *v2)
+{
+  char * const *p1 = v1;
+  char * const *p2 = v2;
+  return strcmp (*p1, *p2);
+}
+
+int
+main (int argc, char **argv)
+{
+  for (int i = 1; i < argc; i++)
+    printf ("%s ", argv[i]);
+  puts ("");
+
+  qsort (argv + 1, argc - 1, sizeof (char *), compare_strings);
+
+  for (int i = 1; i < argc; i++)
+    printf ("%s ", argv[i]);
+
+  return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+: d c b a 
+: a b c d
+
+** Search Functions
+:PROPERTIES:
+:header-args:C: :results output :includes <stdio.h> <string.h> <assert.h> <stdlib.h>
+:END:
+
+#+BEGIN_SRC C :cmdline "'hello world'"
+int
+main (int argc, char *argv[argc+1])
+{
+  char *string;
+  char c;
+  char *wp;
+  char *result;
+  int len;
+
+  string = argv[1];
+  printf ("The String is '%s'\n", string);
+
+  c = 'o';
+  wp = memchr (string, c, strlen (string));
+
+  if (wp == NULL)
+    {
+      printf ("No match was found, '%s' doesn't contains '%c'\n", string, c);
+      exit (0);
+    }
+
+  len = wp - string + 1;
+  result = malloc (len + 1);
+
+  if (result == NULL)
+    {
+      printf ("malloc failed\n");
+      exit (0);
+    }
+
+  memcpy (result, string, len);
+  result[len] = '\0';
+
+  printf ("and the substring till '%c' is '%s'", c, result);
+  return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+: The String is 'hello world'
+: and the substring till 'o' is 'hello'
+
+#+BEGIN_SRC C
+puts (memchr ("hello, world", 'o', 12));
+puts (strchr ("hello, world", 'o'));
+#+END_SRC
+
+#+RESULTS:
+: o, world
+: o, world
+
+strchr v.s. strlen
+
+#+BEGIN_SRC C
+{
+  char buffer[10] = "hello";
+  char *p  = buffer + strlen (buffer);
+  ,*p = '!',  *(p+1) = '\0';
+  puts (buffer);
+}
+
+{
+  char buffer[10] = "hello";
+  char *p  = strchr (buffer, '\0');
+  ,*p = '!',  *(p+1) = '\0';
+  puts (buffer);
+}
+
+#+END_SRC
+
+#+RESULTS:
+: hello!
+: hello!
