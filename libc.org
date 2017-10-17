@@ -682,3 +682,104 @@ printf ("'%s' = %d", "/", a64l ("/"));
 
 #+RESULTS:
 : '/' = 1
+
+* Searching and Sorting
+
+The Comparison function:
+
+#+BEGIN_SRC C
+int
+compare_doubles (const void *a, const void *b)
+{
+  const double *da = (const double *) a;
+  const double *db = (const double *) b;
+
+  return (*da > *db) - (*da < *db);
+}
+
+int
+main ()
+{
+  double a, b, c;
+  
+  a = 1.2;
+  b = c = 3.4;
+
+  printf ("%d, %d, %d",
+          compare_doubles (&a, &b),
+          compare_doubles (&b, &a),
+          compare_doubles (&b, &c));
+  return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+| -1 | 1 | 0 |
+
+Search array:
+
+#+BEGIN_SRC C :results output
+#include <search.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int 
+compare_strings (const void *v1, const void *v2)
+{
+  char * const *p1 = v1;
+  char * const *p2 = v2;
+  return strcmp (*p1, *p2);
+}
+
+int
+compare_numbers (const void *v1, const void *v2)
+{
+  int *p1 = (int *)v1;
+  int *p2 = (int *)v2;
+  return *p1 - *p2;
+}
+
+int
+main (int argc, char *argv[argc+1])
+{
+  int numbers[] = { 3, 1, 12, 2, 4 };
+  size_t nnumbers = sizeof numbers / sizeof (int);
+  int key;
+  int *p;
+
+  key = 12; 
+  p = lfind (&key, numbers, &nnumbers, sizeof (int), compare_numbers);
+  if (p == NULL)
+    puts ("No match was found");
+  else
+    printf ("numbers[%ld] = %d\n", p - numbers, key);
+
+  key = 100; 
+  p = lfind (&key, numbers, &nnumbers, sizeof (int), compare_numbers);
+  if (p == NULL)
+    puts ("No match was found");
+  else
+    printf ("numbers[%ld] = %d\n", p - numbers, key);
+
+  {
+    int numbers[] = { 1, 2, 3, 4, 5 };
+    size_t nnumbers = sizeof numbers / sizeof (int);
+    int key;
+
+    key = 3;
+    int *p = bsearch (&key, numbers, nnumbers, sizeof (int), compare_numbers);
+    if (! p)
+      puts ("No match was found");
+    else
+      printf ("numbers[%ld] = %d\n", p - numbers, key);
+  }
+
+  return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+: numbers[2] = 12
+: No match was found
+: numbers[2] = 3
