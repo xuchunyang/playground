@@ -433,3 +433,57 @@ puts (buffer);
 
 #+RESULTS:
 : Hello,
+
+** String/Array Comparison
+:PROPERTIES:
+:header-args:C: :results output :includes <stdio.h> <string.h> <assert.h> <stdlib.h>
+:END:
+
+#+BEGIN_SRC C
+char *s1, *s2;
+s1 = s2 = "hello";
+printf ("%s %s %s\n", s1, strcmp (s1, s2) ? "!=" : "=", s2);
+
+s2 = "HELLO";
+printf ("%s %s %s\n", s1, strcmp (s1, s2) ? "!=" : "=", s2);
+#+END_SRC
+
+#+RESULTS:
+: hello = hello
+: hello != HELLO
+
+memcmp compares two arrays byte-by-byte
+
+#+BEGIN_SRC C
+unsigned char ary1[] = { 'a', 'b', 'c' };
+unsigned char ary2[] = { 'a', 'b', 'c' };
+int size = sizeof ary1 / sizeof (unsigned char);
+printf ("%d\n", memcmp (ary1, ary2, size));
+
+ary2[size - 1] = 'C';
+printf ("%d\n", memcmp (ary1, ary2, size));
+printf ("%d\n", memcmp (ary2, ary1, size));
+#+END_SRC
+
+#+RESULTS:
+: 0
+: 32
+: -32
+
+~strcasecmp~ ignores case:
+
+#+BEGIN_SRC C
+printf ("%d\n", strcmp ("hello", "HELLO"));
+printf ("%d\n", strcasecmp ("hello", "HELLO"));
+#+END_SRC
+
+#+RESULTS:
+: 32
+: 0
+
+#+BEGIN_SRC C
+printf ("%d", strncmp ("hello", "hello, world", strlen ("hello")));
+#+END_SRC
+
+#+RESULTS:
+: 0
