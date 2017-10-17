@@ -72,6 +72,19 @@ sort_print (int nums[], int size)
 }
 
 int
+compare_numbers (const void *v1, const void *v2)
+{
+  return *(int *)v1 - *(int *)v2;
+}
+
+int
+sort_numbers (int *numbers, int nnumbers)
+{
+  qsort (numbers, nnumbers, sizeof (int), compare_numbers);
+  return 0;
+}
+
+int
 nums_equal (int nums1[], int size1, int nums2[], int size2)
 {
   if (size1 != size2) return -1;
@@ -240,6 +253,12 @@ main ()
   }
   {
     print_strings ("Hello", ", ", "World", "!\n", NULL);
+  }
+  {
+    int numbers[] = { 4, 3, 2, 1, 100 };
+    int nnumbers = sizeof numbers / sizeof (int);
+    sort_numbers (numbers, nnumbers);
+    print_nums (numbers, nnumbers, ",");
   }
   return 0;
 }
