@@ -150,3 +150,286 @@ Case Conversion:
 assert (tolower ('A') == 'a');
 assert (toupper ('a') == 'A');
 #+END_SRC
+
+* String and Array Utilities
+:PROPERTIES:
+:header-args:C: :results output :includes <stdio.h> <string.h> <errno.h>
+:END:
+
+** C Strings
+
+Concat string literals:
+
+#+BEGIN_SRC C
+puts ("Hello," " World!");
+#+END_SRC
+
+#+RESULTS:
+: Hello, World!
+
+** String Length
+
+strlen returns the length of a string in bytes:
+
+#+BEGIN_SRC C :includes <string.h>
+printf ("%d\n", strlen ("hello, world"));
+#+END_SRC
+
+#+RESULTS:
+: 12
+
+sizeof returns the size of data type/variable in bytes:
+
+#+BEGIN_SRC C :includes <string.h>
+char string[32] = "hello, world";
+printf ("sizeof = %d\n", sizeof (string));
+printf ("strlen = %d\n", strlen (string));
+
+char *ptr = string;
+printf ("sizeof = %d\n", sizeof (ptr));
+printf ("strlen = %d\n", strlen (ptr));
+#+END_SRC
+
+#+RESULTS:
+: sizeof = 32
+: strlen = 12
+: sizeof = 8
+: strlen = 12
+
+implement strlen
+
+#+BEGIN_SRC C
+int
+my_strlen (const char *S)
+{
+  int length = 0;
+  while (*S++) length++;
+  return length;
+}
+
+int
+main ()
+{
+  printf ("%d = %d\n", strlen (""), my_strlen (""));
+  printf ("%d = %d\n", strlen ("hi"), my_strlen ("hi"));
+  char s[] = { 'h', 'i', '\0', '!' };
+  printf ("%d = %d\n", strlen (s), my_strlen (s));
+  return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+: 0 = 0
+: 2 = 2
+: 2 = 2
+
+** Copying Strings and Arrays
+:PROPERTIES:
+:header-args:C: :results output :includes <stdio.h> <string.h> <assert.h>
+:END:
+
+Copy array:
+
+#+BEGIN_SRC C :cmdline "hello world"
+int old[] = { 1, 2, 3, 4, 5 };
+
+int length = sizeof old / sizeof (int);
+int new[length];
+
+assert (new == memcpy (new, old, sizeof old));
+
+for (int i = 0; i < length; i++)
+  printf ("%d\n", new[i]);
+#+END_SRC
+
+#+RESULTS:
+: 1
+: 2
+: 3
+: 4
+: 5
+
+Move array:
+
+#+BEGIN_SRC C
+int ary[5] = { 1, 2, 3 };
+int len = sizeof ary / sizeof (int);
+for (int i = 0; i < len; i++)
+  printf ("%d%s", ary[i], i < len - 1 ? ", " : "\n");
+
+memmove (ary + 2, ary, 3 * sizeof (int));
+
+for (int i = 0; i < len; i++)
+  printf ("%d%s", ary[i], i < len - 1 ? ", " : "\n");
+#+END_SRC
+
+#+RESULTS:
+: 1, 2, 3, 0, 0
+: 1, 2, 1, 2, 3
+
+Copy string until character found:
+
+#+BEGIN_SRC C
+int from[] = { 1, 2, 3, 3, 3, 100 };
+int len = sizeof from / sizeof (int);
+for (int i = 0; i < len; i++)
+  printf ("%d%s", from[i], i < len - 1 ? ", " : "\n");
+
+int to[len];
+/* assert (to + 2 == memccpy (to, from, 3, len * sizeof (int))); */
+int *p = memccpy (to, from, 3, len * sizeof (int));
+assert (p - to == 2);
+printf ("%d ints copied.\n", (p - to) + 1);
+
+for (int i = 0; i < len; i++)
+  printf ("%d%s", to[i], i < len - 1 ? ", " : "\n");
+#+END_SRC
+
+#+RESULTS:
+: 1, 2, 3, 3, 3, 100
+: 3 ints copied.
+: 1, 2, 3, 0, 1453651632, 32767
+
+Fill character into a string:
+
+#+BEGIN_SRC C
+char s[10] = "hi";
+memset (s + strlen (s), '!', sizeof s - strlen (s) - 1);
+s[9] = 0;
+puts (s);
+#+END_SRC
+
+#+RESULTS:
+: hi!!!!!!!
+
+Copy a string:
+
+#+BEGIN_SRC C
+char *s1 = "Hello World!";
+char s2[strlen (s1) + 1];
+puts (s1);
+assert (s2 == strcpy (s2, s1));
+puts (s2);
+#+END_SRC
+
+#+RESULTS:
+: Hello World!
+: Hello World!
+
+Save a copy of a string:
+
+#+BEGIN_SRC C
+char *s = strdup ("Hello, World!");
+assert (s);
+puts (s);
+free (s);
+#+END_SRC
+
+#+RESULTS:
+: Hello, World!
+
+Copy a string:
+
+#+BEGIN_SRC C
+char buffer[512];
+stpcpy (stpcpy (buffer, "foo"), "bar");
+puts (buffer);
+#+END_SRC
+
+#+RESULTS:
+: foobar
+
+** Concatenating Strings
+:PROPERTIES:
+:header-args:C: :results output :includes <stdio.h> <string.h> <assert.h> <stdlib.h> <stdarg.h>
+:END:
+
+#+BEGIN_SRC C
+char buffer[512] = "hello";
+strcat (buffer, " ");
+strcat (buffer, "world");
+puts (buffer);
+#+END_SRC
+
+#+RESULTS:
+: hello world
+
+strcat should be avoided
+
+#+BEGIN_SRC C
+char *
+concat (const char *str, ...)
+{
+  va_list ap;
+  size_t allocated = 100;
+  char *result = malloc (allocated);
+
+  if (result != NULL)
+    {
+      char *newp;
+      char *wp;
+      const char *s;
+
+      va_start (ap, str);
+
+      wp = result;
+      for (s = str; s != NULL; s = va_arg (ap, const char *))
+        {
+          size_t len = strlen (s);
+
+          /* Resize the allocated memory if necessary.  */
+          if (wp + len + 1 > result + allocated)
+            {
+              allocated = (allocated + len) * 2;
+              newp = realloc (result, allocated);
+              if (newp == NULL)
+                {
+                  free (result);
+                  return NULL;
+                }
+              wp = newp + (wp - result);
+              result = newp;
+            }
+          
+          memcpy (wp, s, len);
+          wp += len;
+        }
+
+      /* Terminate the result string.  */
+      ,*wp++ = '\0';
+
+      /* Resize memory to the optimal size.  */
+      newp = realloc (result, wp - result);
+      if (newp != NULL)
+        result = newp;
+
+      va_end (ap);
+    }
+  
+  return result;
+}
+
+int
+main ()
+{
+  char *result = concat ("Hello", ", ", "World", "!", NULL);
+  puts (result);
+  return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+: Hello, World!
+
+#+BEGIN_SRC C
+char *s = "Hello, World!";
+char buffer[100];
+int size = 6;
+assert (buffer == strncpy (buffer, s, size));
+if (strlen (s) > size) 
+  buffer[size] = '\0';
+puts (buffer);
+#+END_SRC
+
+#+RESULTS:
+: Hello,
