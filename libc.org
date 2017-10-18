@@ -997,4 +997,31 @@ free (result);
 #+RESULTS:
 : My name is Chunyang and I'm 24 years old
 
-** Input
+** Formatted Input
+
+#+BEGIN_SRC C
+int num;
+scanf ("%d", &num);
+printf ("%d\n", num);
+#+END_SRC
+
+** File Postioning
+
+#+BEGIN_SRC C
+char *filename = "/etc/hosts";
+FILE *stream = fopen (filename, "r");
+int c;
+
+c = getc (stream);
+printf ("The first character in %s is '%c'\n", filename, c);
+
+fseek (stream, -1, SEEK_END);
+
+c = getc (stream);
+printf ("The last character in %s is '%c'\n", filename, c);
+#+END_SRC
+
+#+RESULTS:
+: The first character in /etc/hosts is '#'
+: The last character in /etc/hosts is '
+: '
