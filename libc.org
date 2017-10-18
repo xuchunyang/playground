@@ -1111,3 +1111,135 @@ main ()
 #+RESULTS:
 : The page size is 4096 bytes
 : #include <stdio.h>
+
+* Waiting for Input and Output
+:PROPERTIES:
+:header-args:C: :includes <signal.h> <sys/types.h> <sys/time.h> <fcntl.h> <unistd.h> <stdio.h> <assert.h> <errno.h> :results output
+:END:
+
+#+BEGIN_SRC C
+printf ("fd_set can hold no more than '%d' file descriptors", FD_SETSIZE);
+
+fd_set set;
+struct timeval timeout;
+
+FD_ZERO (&set);
+FD_SET (STDIN_FILENO, &set);
+
+timeout.tv_sec = 5;
+timeout.tv_usec = 0;
+
+int result = select (FD_SETSIZE, &set, NULL, NULL, &timeout);
+
+printf ("select returned %d.\n", result);
+#+END_SRC
+
+#+RESULTS:
+: fd_set can hold no more than '1024' file descriptorsselect returned 1.
+
+* File System Interface
+:PROPERTIES:
+:header-args:C: :includes <unistd.h> <stdio.h> :results output
+:END:
+
+#+BEGIN_SRC C
+char *pwd;
+
+pwd = getcwd (NULL, 0);
+puts (pwd);
+free (pwd);
+
+chdir ("/");
+
+pwd = getcwd (NULL, 0);
+puts (pwd);
+free (pwd);
+#+END_SRC
+
+#+RESULTS:
+: /Users/xcy/src/playground
+: /
+
+List a directory:
+
+#+BEGIN_SRC C :includes <stdio.h> <sys/types.h> <dirent.h>
+DIR *dp;
+struct dirent *ep;
+
+dp = opendir ("./");
+if (dp != NULL)
+  {
+    while (ep = readdir (dp))
+      puts (ep->d_name);
+    closedir (dp);
+  }
+ else 
+   printf ("Coundn't open the directory");
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+.
+..
+.git
+.gitignore
+.travis.yml
+a.out
+date.c
+error.c
+func.c
+hello-world.c
+hello-world.rkt
+libc.org
+Makefile
+read-and-write-file.c
+read-and-write-file.rkt
+README.md
+#+END_EXAMPLE
+
+List a directory via ~scandir~
+
+#+BEGIN_SRC C :includes <stdio.h> <dirent.h>
+int
+one (const struct dirent *unused)
+{
+  return 1;
+}
+
+int
+main (void)
+{
+  struct dirent **eps;
+  int n;
+
+  n = scandir (".", &eps, one, alphasort);
+  if (n >= 0)
+    {
+      for (int i = 0; i < n; i++)
+        puts (eps[i]->d_name);
+    }
+  else 
+    printf ("Cound't open the directory");
+  return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+.
+..
+.git
+.gitignore
+.travis.yml
+Makefile
+README.md
+a.out
+date.c
+error.c
+func.c
+hello-world.c
+hello-world.rkt
+libc.org
+read-and-write-file.c
+read-and-write-file.rkt
+#+END_EXAMPLE
