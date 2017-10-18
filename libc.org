@@ -1025,3 +1025,89 @@ printf ("The last character in %s is '%c'\n", filename, c);
 : The first character in /etc/hosts is '#'
 : The last character in /etc/hosts is '
 : '
+
+* Low-Level Input/Output
+:PROPERTIES:
+:header-args:C: :includes <fcntl.h> <unistd.h> <sys/uio.h> <stdio.h> <assert.h> :results output
+:END:
+
+Output:
+
+#+BEGIN_SRC C
+int fd = open ("/dev/stdout", O_WRONLY);
+char *msg = "Hello, World!";
+size_t len = strlen (msg);
+assert (len == write (fd, msg, len));
+close (fd);
+#+END_SRC
+
+#+RESULTS:
+: Hello, World!
+
+Input:
+
+#+BEGIN_SRC C
+char *filename = "hello-world.c";
+int fd = open (filename, O_RDONLY);
+char c;
+while (read (fd, &c, 1) && c != '\n')
+  putc (c, stdout);
+
+printf ("\nThe current file position is %d\n", lseek (fd, 0, SEEK_CUR));
+#+END_SRC
+
+#+RESULTS:
+: #include <stdio.h>
+: The current file position is 19
+
+Use ~readv~
+
+#+BEGIN_SRC C
+char *filename = "hello-world.c";
+int fd = open (filename, O_RDONLY);
+int len = 20;
+char buffer[len];
+struct iovec bv;
+bv.iov_base = buffer;
+bv.iov_len  = len;
+readv (fd, &bv, 1);
+buffer[len - 1] = '\0';
+puts (buffer);
+#+END_SRC
+
+#+RESULTS:
+: #include <stdio.h>
+
+mmap
+
+#+BEGIN_SRC C
+#include <unistd.h>             /* sysconf */
+#include <sys/mman.h>           /* mmap */
+
+int
+main ()
+{
+  size_t page_size = (size_t) sysconf (_SC_PAGESIZE);
+  printf ("The page size is %d bytes\n", page_size);
+
+  int fd = open ("hello-world.c", O_RDONLY);
+
+  void *p;
+  size_t len = 20;
+  p = mmap (NULL, len, PROT_READ, MAP_PRIVATE, fd, 0);
+  if (p == MAP_FAILED)
+    {
+      puts ("mmap failed");
+      exit(0);
+    }
+  char *cp = p;
+  for (int i = 0; i < len; i++)
+    putc (*cp++, stdout);
+
+  return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+: The page size is 4096 bytes
+: #include <stdio.h>
