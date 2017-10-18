@@ -783,3 +783,88 @@ main (int argc, char *argv[argc+1])
 : numbers[2] = 12
 : No match was found
 : numbers[2] = 3
+
+* Pattern Matching
+
+Wildcard pattern:
+
+#+BEGIN_SRC C
+printf ("%d\n", fnmatch ("foo.*", "foo.txt", 0));
+printf ("%d\n", fnmatch ("bar.*", "foo.txt", 0));
+printf ("%d\n", fnmatch ("???.*", "foo.txt", 0));
+#+END_SRC
+
+#+RESULTS:
+| 0 |
+| 1 |
+| 0 |
+
+Globbing
+
+#+BEGIN_SRC C :tangle foo.c
+#include <glob.h>
+#include <stdio.h>
+
+int
+main ()
+{
+  glob_t g;
+  glob("*.c", NULL, NULL, &g);
+  for (int i = 0; i < g.gl_matchc; i++)
+    puts (g.gl_pathv[i]);
+  globfree (&g);
+  return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+| date.c                |
+| error.c               |
+| foo.c                 |
+| func.c                |
+| hello-world.c         |
+| read-and-write-file.c |
+
+Regular Expression Matching
+
+#+BEGIN_SRC C :includes <regex.h> <stdio.h> <assert.h> <string.h> <errno.h> <stdlib.h> :results output
+char *string[] = { "README.md",
+                   "libc.org",
+                   "foo.c",
+                   "foo.h",
+                   "read-and-write-file.rkt",
+                   "hello-world.c",
+                   NULL };
+char *pattern = "...\\.c";
+regex_t re;
+int rtv;
+
+if ((rtv = regcomp (&re, pattern, REG_EXTENDED | REG_NOSUB)))
+  {
+    printf ("regcomp errors with code: %d\n", rtv);
+    exit (0);
+  }
+
+for (int i = 0; string[i] != NULL; i++)
+  switch (regexec (&re, string[i], 0, NULL, 0))
+    {
+    case 0:
+      printf ("Y %s\n", string[i]);
+      break;
+    case REG_NOMATCH:
+      printf ("N %s\n", string[i]);
+      break;
+    case REG_ESPACE:
+      break;
+    }
+
+regfree (&re);
+#+END_SRC
+
+#+RESULTS:
+: N README.md
+: N libc.org
+: Y foo.c
+: N foo.h
+: N read-and-write-file.rkt
+: Y hello-world.c
