@@ -868,3 +868,133 @@ regfree (&re);
 : N foo.h
 : N read-and-write-file.rkt
 : Y hello-world.c
+
+* I/O
+:PROPERTIES:
+:header-args:C: :includes <stdio.h> <assert.h> :results output
+:END:
+
+stdout/stdin/stderr are normal variables:
+
+#+BEGIN_SRC C
+fclose (stdout);
+stdout = fopen ("standard-output-file", "w");
+puts ("Hello, World");
+#+END_SRC
+
+#+RESULTS:
+
+Read a file:
+
+#+BEGIN_SRC C
+FILE *stream = fopen ("/etc/hosts", "r");
+int c;
+while ((c = getc (stream)) != EOF)
+  fputc (c, stdout);
+fclose (stream);
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+##
+# Host Database
+#
+# localhost is used to configure the loopback interface
+# when the system is booting.  Do not change this entry.
+##
+127.0.0.1	localhost
+255.255.255.255	broadcasthost
+::1             localhost 
+fe80::1%lo0	localhost
+
+# The following is added by Chunyang Xu <2017-09-01 Fri>
+127.0.0.1     mac.me  mac
+192.168.0.104 arch.me arch
+#+END_EXAMPLE
+
+Write/append/read file:
+
+#+BEGIN_SRC C
+const char *filename = "/tmp/nonexist.txt";
+FILE *stream;
+int c;
+
+/* Write */
+stream = fopen (filename, "w");
+fputs ("Hello, World!\n", stream);
+fclose (stream);
+
+/* Append */
+
+stream = fopen (filename, "a");
+fputs ("This is the second line.\n", stream);
+fclose (stream);
+
+/* Read */
+stream = fopen (filename, "r");
+while ((c = getc (stream)) != EOF)
+  fputc (c, stdout);
+#+END_SRC
+
+#+RESULTS:
+: Hello, World!
+: This is the second line.
+
+Read and write by block (fixed size):
+
+#+BEGIN_SRC C
+const char *filename = "/etc/hosts";
+FILE *stream = fopen (filename, "r");
+char buffer[21];
+int count = sizeof buffer - 1;
+buffer[count] = '\0';
+assert (count == fread (buffer, sizeof (char), count, stream));
+puts (buffer);
+#+END_SRC
+
+#+RESULTS:
+: ##
+: # Host Database
+: #
+
+#+BEGIN_SRC C
+const char *filename = "/tmp/nonexist.binary";
+FILE *stream = fopen (filename, "w");
+int buffer[100];
+int count = sizeof buffer / sizeof (int);
+for (int i = 0; i < count; i++)
+  buffer[i] = i;
+fwrite (buffer, sizeof (int), count, stream);
+#+END_SRC
+
+#+RESULTS:
+
+Format print:
+
+#+BEGIN_SRC C
+char buffer[] = "hello";
+printf ("buffer     = %p\n", buffer);
+printf ("buffer + 1 = %p\n", buffer + 1);
+
+int numbers[] = { 1, 2, 3 };
+printf ("numbers     = %p\n", numbers);
+printf ("numbers + 1 = %p\n", numbers + 1);
+#+END_SRC
+
+#+RESULTS:
+: buffer     = 0x7fff52b4d692
+: buffer + 1 = 0x7fff52b4d693
+: numbers     = 0x7fff52b4d69c
+: numbers + 1 = 0x7fff52b4d6a0
+
+#+BEGIN_SRC C
+char *result;
+asprintf (&result, "My name is %s and I'm %d years old", "Chunyang", 24);
+puts (result);
+free (result);
+#+END_SRC
+
+#+RESULTS:
+: My name is Chunyang and I'm 24 years old
+
+** Input
