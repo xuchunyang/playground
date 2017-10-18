@@ -1243,3 +1243,61 @@ libc.org
 read-and-write-file.c
 read-and-write-file.rkt
 #+END_EXAMPLE
+
+* Pipe
+
+Talk between parent and child process
+
+#+BEGIN_SRC C :results output
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int
+main (int argc, char *argv[argc+1])
+{
+  pid_t pid;
+  int mypipe[2];
+  
+  /* Create the pipe.  */
+  if (pipe (mypipe))
+    {
+      puts ("Pipe failed");
+      exit (0);
+    }
+
+  int in = mypipe[0];
+  int out = mypipe[1];
+
+  pid = fork ();
+  if (pid == 0)
+    {
+      /* Child process.  */
+      close (out);
+      FILE *stream = fdopen (in, "r");
+      int c;
+      while ((c = getc (stream)) != EOF)
+        putc (c, stdout);
+      fclose (stream);
+      return 0;
+    }
+  else if (pid < 0)
+    {
+      /* fork failed.  */
+      puts ("Fork failed");
+      return 0;
+    }
+  else
+    {
+      /* parent process.  */
+      close (in);
+      FILE *stream = fdopen (out, "w");
+      fputs ("hello world!\n", stream);
+      fputs ("goodbye, world!\n", stream);
+    }
+}
+#+END_SRC
+
+#+RESULTS:
+: hello world!
+: goodbye, world!
