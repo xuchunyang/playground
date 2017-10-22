@@ -1,0 +1,113 @@
+[[http://os.camden.rutgers.edu/c_resources/c_manual/C/CONCEPT/storage_class.html][C Storage Classes]]
+
+** auto
+
+auto 是 local variable 的默认 Storage Class.
+
+#+BEGIN_SRC C
+int
+foo ()
+{
+  int a = 0;
+  auto int b = 1;
+
+  return a + b;
+}
+#+END_SRC
+
+** register
+
+建议让 local variable 存在 Register 中，而非一般的 RAM
+
+#+BEGIN_SRC C
+for (register int i = 'a'; i < 'z'; i++)
+  printf ("%c", i);
+#+END_SRC
+
+#+RESULTS:
+: abcdefghijklmnopqrstuvwxy
+
+** static
+
+static 是 global variable 的默认 Storage Class.
+
+#+BEGIN_SRC C
+static int a = 1;
+int b = 2;
+
+int
+main ()
+{
+  return 0;
+}
+#+END_SRC
+
+static 用在 local variable 时，会使它变成 global variable 的效果，它在编译期间就完成初始化.
+
+#+BEGIN_SRC C :results output
+#include <stdio.h>
+
+char *
+foo ()
+{
+  static char s[] = "Hello, static!";
+  return s;
+}
+
+int
+main ()
+{
+  puts (foo ());
+  return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+: Hello, static!
+
+static 还可以用在 function 上，以限定这个函数只能在当前文件中使用
+
+#+NAME: main.c
+#+BEGIN_SRC C :tangle main.c
+int
+main ()
+{
+  foo ();
+  bar ();
+}
+#+END_SRC
+
+#+NAME: funcs.c
+#+BEGIN_SRC C :tangle funcs.c :main no
+int
+foo () 
+{
+  return 0;
+}
+
+static int
+bar ()
+{
+  return 0;
+}
+#+END_SRC
+
+#+BEGIN_SRC sh :results output
+cc main.c funcs.c 2>&1 || true
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+main.c:4:3: warning: implicit declaration of function 'foo' is invalid in C99 [-Wimplicit-function-declaration]
+  foo ();
+  ^
+main.c:5:3: warning: implicit declaration of function 'bar' is invalid in C99 [-Wimplicit-function-declaration]
+  bar ();
+  ^
+2 warnings generated.
+Undefined symbols for architecture x86_64:
+  "_bar", referenced from:
+      _main in main-15f87e.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+#+END_EXAMPLE
