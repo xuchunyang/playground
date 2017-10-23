@@ -1,3 +1,5 @@
+/* https://www.ibm.com/developerworks/linux/tutorials/l-glib/ */
+
 #include <glib.h>
 #include <stdio.h>
 
