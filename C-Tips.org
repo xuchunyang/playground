@@ -1,0 +1,62 @@
+* Quick commenting
+
+Comment via preprocessor:
+
+#+BEGIN_SRC C
+puts ("a");
+#if 0
+puts ("xxx");
+#endif
+puts ("b");
+#+END_SRC
+
+#+RESULTS:
+| a |
+| b |
+
+* Quick debugging
+
+#+BEGIN_SRC C
+int x = 42;
+
+#ifdef DEBUG
+printf ("DEBUG: x = %d\n", x);
+#endif
+#+END_SRC
+
+#+RESULTS:
+
+编译期间用 ~-DDEBUG~ 选项打开 Debug：
+
+#+BEGIN_SRC C :flags -DDEBUG
+int x = 42;
+
+#ifdef DEBUG
+printf ("DEBUG: x = %d\n", x);
+#endif
+#+END_SRC
+
+#+RESULTS:
+: DEBUG: x = 42
+
+Macro：
+
+#+BEGIN_SRC C :flags -DDEBUG
+#include <stdio.h>
+
+#ifdef DEBUG
+#define DEBUG(s) puts (s);
+#else
+#define DEBUG(s)
+#endif
+
+int
+main (void)
+{
+  DEBUG ("DEBUG: xxx");
+  return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+: DEBUG: xxx
